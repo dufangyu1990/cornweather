@@ -75,6 +75,21 @@ public class AreaFragmentView extends ViewImp{
 
     public void showProgressDialog()
     {
+        if(progressDialog==null)
+        {
+            progressDialog = new ProgressDialog(mRootView.getContext());
+            progressDialog.setMessage("正在加载...");
+            progressDialog.setCanceledOnTouchOutside(false);
+        }
+        progressDialog.show();
+    }
 
+
+    public void closeProDialog()
+    {
+        if(progressDialog!=null)
+        {
+            progressDialog.dismiss();
+        }
     }
 }

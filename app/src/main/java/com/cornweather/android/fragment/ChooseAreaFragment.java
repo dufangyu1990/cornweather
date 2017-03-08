@@ -1,5 +1,6 @@
 package com.cornweather.android.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -7,6 +8,7 @@ import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.cornweather.android.R;
+import com.cornweather.android.WeatherActivity;
 import com.cornweather.android.callback.DataCallBack;
 import com.cornweather.android.db.City;
 import com.cornweather.android.db.Country;
@@ -83,6 +85,13 @@ public class ChooseAreaFragment extends FragmentPresentImp<AreaFragmentView> imp
         {
             selectedCity = cityList.get(position);
             queryCountries();
+        }else if(currentLevel==Constant.LEVEL_COUNTRY)
+        {
+            String weatherId = countryList.get(position).getWeatherId();
+            Intent intent = new Intent(getActivity(), WeatherActivity.class);
+            intent.putExtra("weather_id",weatherId);
+            startActivity(intent);
+            getActivity().finish();
         }
 
 
@@ -126,7 +135,6 @@ public class ChooseAreaFragment extends FragmentPresentImp<AreaFragmentView> imp
             currentLevel = Constant.LEVEL_CITY;
         }else{
             int provinceCode = selectedProvince.getProvinceCode();
-//            queryFromServer("",Constant.CITYTYPE);
             queryFromServer(Constant.URL+"/"+provinceCode,Constant.CITYTYPE);
         }
     }

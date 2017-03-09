@@ -2,13 +2,14 @@ package com.cornweather.android.gson;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by dufangyu on 2017/3/8.
  */
 
-public class Weather {
+public class Weather implements Serializable{
 
     public String status;
 

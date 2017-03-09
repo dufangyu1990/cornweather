@@ -15,5 +15,8 @@ public class Constant {
     public static final String COUNTRYTYPE = "country";
     public static final String KEY = "4b50b6a29dd7444dad3b6e99faf853b3";
     public static final String IMAGEURL = "http://guolin.tech/api/bing_pic";
+    public static final String UPDATEWEATHERACTION="updateWeather";
+    public static final String UPDATEBGIMGACTION="updateImage";
+
 
 }

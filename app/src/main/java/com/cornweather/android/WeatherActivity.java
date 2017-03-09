@@ -1,10 +1,15 @@
 package com.cornweather.android;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.Toast;
@@ -14,7 +19,9 @@ import com.cornweather.android.gson.Weather;
 import com.cornweather.android.model.ILogicModel;
 import com.cornweather.android.model.LogicModelImp;
 import com.cornweather.android.present.ActivityPresentImp;
+import com.cornweather.android.service.AutoUpdateService;
 import com.cornweather.android.util.Constant;
+import com.cornweather.android.util.LogUtil;
 import com.cornweather.android.util.Utility;
 
 
@@ -26,6 +33,9 @@ public class WeatherActivity extends ActivityPresentImp<WeatherView> implements 
 
     private ILogicModel modelBiz;
     private String globalweatherId;
+    private LocalBroadcastManager localBroadcastManager;
+    private IntentFilter filter;
+    private Intent serviceIntent;
     @Override
     public void afterViewCreate(Bundle savedInstance) {
         super.afterViewCreate(savedInstance);
@@ -37,10 +47,12 @@ public class WeatherActivity extends ActivityPresentImp<WeatherView> implements 
             decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
-
+        localBroadcastManager = LocalBroadcastManager.getInstance(this);
+        filter = new IntentFilter(Constant.UPDATEBGIMGACTION);
+        filter.addAction(Constant.UPDATEWEATHERACTION);
+        localBroadcastManager.registerReceiver(mReceiver, filter);
         modelBiz = new LogicModelImp();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-
         String bgpic =preferences.getString("bgImg",null);
         if(bgpic!=null)
         {
@@ -54,6 +66,10 @@ public class WeatherActivity extends ActivityPresentImp<WeatherView> implements 
             Weather weather = Utility.handleWeatherResponse(weatherString);
             globalweatherId = weather.basic.weatherId;
             showWeatherInfo(weather);
+
+            LogUtil.d("dfy","启动服务");
+            serviceIntent= new Intent(this, AutoUpdateService.class);
+            startService(serviceIntent);
         }else{
             globalweatherId = getIntent().getStringExtra("weather_id");
             mView.showNdHideWeather(false);
@@ -69,6 +85,7 @@ public class WeatherActivity extends ActivityPresentImp<WeatherView> implements 
     private void requestWeather(final String weatherId)
     {
 
+//        LogUtil.d("dfy","传给后台weatherId = "+weatherId);
         String weatherUrl = Constant.WEATHERBASEURL+"?city="+weatherId+"&key="+Constant.KEY;
         modelBiz.getDataFromServer(weatherUrl, "", new DataCallBack() {
             @Override
@@ -123,6 +140,7 @@ public class WeatherActivity extends ActivityPresentImp<WeatherView> implements 
 
     @Override
     public void onRefresh() {
+//        LogUtil.d("dfy","下拉刷新weatherId = "+globalweatherId);
         requestWeather(globalweatherId);
     }
 
@@ -135,10 +153,38 @@ public class WeatherActivity extends ActivityPresentImp<WeatherView> implements 
     }
 
     public  void refreshNewCity(String weatherId)
-    {    globalweatherId = weatherId;
+
+    {
+//        LogUtil.d("dfy","重新选择城市weatherId = "+weatherId);
+        globalweatherId = weatherId;
         mView.openDrawlayoutOrclose("close");
         mView.closeRefreshOropen(true);
         requestWeather(globalweatherId);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        localBroadcastManager.unregisterReceiver(mReceiver);
+        stopService(serviceIntent);
+    }
+
+    BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            LogUtil.d("dfy","后台服务刷新天气和图片");
+            String action = intent.getAction();
+            if(action.equals(Constant.UPDATEWEATHERACTION))
+            {
+                Weather weather = (Weather) intent.getSerializableExtra("weatherinfo");
+                showWeatherInfo(weather);
+            }else if(action.equals(Constant.UPDATEBGIMGACTION))
+            {
+                String bgimg = intent.getStringExtra("bgimg");
+                mView.setBgPic(bgimg);
+
+            }
+        }
+    };
 
 }

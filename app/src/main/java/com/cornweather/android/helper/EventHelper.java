@@ -1,5 +1,6 @@
 package com.cornweather.android.helper;
 
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.AdapterView;
 
@@ -36,6 +37,20 @@ public class EventHelper {
         if (!(li instanceof AdapterView.OnItemSelectedListener)) return;
         itemSelected((AdapterView.OnItemSelectedListener) li, views);
     }
+
+
+    public static void refreshListener(IPresenter li,SwipeRefreshLayout...views)
+    {
+        if(!(li instanceof SwipeRefreshLayout.OnRefreshListener)) return;
+        refreshListener((SwipeRefreshLayout.OnRefreshListener) li, views);
+    }
+
+    public static void refreshListener(SwipeRefreshLayout.OnRefreshListener listener,SwipeRefreshLayout ...views)
+    {
+        if(views == null || views.length == 0) return;
+        for(SwipeRefreshLayout v : views) v.setOnRefreshListener(listener);
+    }
+
 
     public static void click(View.OnClickListener li, View ...views) {
         if(views == null || views.length == 0) return;

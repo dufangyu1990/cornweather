@@ -1,7 +1,11 @@
 package com.cornweather.android;
 
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -10,6 +14,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.cornweather.android.gson.Forecast;
 import com.cornweather.android.gson.Weather;
+import com.cornweather.android.helper.EventHelper;
 import com.cornweather.android.view.ViewImp;
 
 /**
@@ -32,7 +37,11 @@ public class WeatherView extends ViewImp{
 
     private ImageView bgImageView;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
 
+
+    private DrawerLayout drawerLayout;
+    private Button navButton;
 
     @Override
     public int getLayoutId() {
@@ -53,7 +62,10 @@ public class WeatherView extends ViewImp{
         carWashText = findViewById(R.id.car_wash_text);
         sportText = findViewById(R.id.sport_text);
         bgImageView = findViewById(R.id.bgImg);
-
+        swipeRefreshLayout = findViewById(R.id.swip_refresh);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
+        drawerLayout = findViewById(R.id.draw_layout);
+        navButton = findViewById(R.id.nav_button);
     }
 
 
@@ -116,5 +128,31 @@ public class WeatherView extends ViewImp{
         Glide.with(mRootView.getContext()).load(pic).into(bgImageView);
     }
 
+    @Override
+    public void bindEvent() {
+        EventHelper.refreshListener(mPresenter,swipeRefreshLayout);
+        EventHelper.click(mPresenter,navButton);
+    }
 
+    public void closeRefreshOropen(boolean flag)
+    {
+        if(flag)
+        {
+            swipeRefreshLayout.setRefreshing(true);
+        }else{
+            swipeRefreshLayout.setRefreshing(false);
+        }
+    }
+
+    public void openDrawlayoutOrclose(String order)
+    {
+        if(order.equals("close"))
+        {
+            drawerLayout.closeDrawers();
+        }else if(order.equals("open"))
+        {
+            drawerLayout.openDrawer(GravityCompat.START);
+        }
+
+    }
 }

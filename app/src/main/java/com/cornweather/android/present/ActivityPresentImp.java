@@ -1,7 +1,7 @@
 package com.cornweather.android.present;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.cornweather.android.helper.GenericHelper;
 import com.cornweather.android.view.IView;
@@ -10,7 +10,7 @@ import com.cornweather.android.view.IView;
  * Created by dufangyu on 2017/3/6.
  */
 
-public class ActivityPresentImp<T extends IView> extends Activity implements IPresenter<T>{
+public class ActivityPresentImp<T extends IView> extends AppCompatActivity implements IPresenter<T>{
 
     protected T mView;
 

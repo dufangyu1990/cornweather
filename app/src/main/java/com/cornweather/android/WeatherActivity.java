@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.View;
 import android.widget.Toast;
 
@@ -16,14 +17,15 @@ import com.cornweather.android.present.ActivityPresentImp;
 import com.cornweather.android.util.Constant;
 import com.cornweather.android.util.Utility;
 
+
 /**
  * Created by dufangyu on 2017/3/8.
  */
 
-public class WeatherActivity extends ActivityPresentImp<WeatherView>{
+public class WeatherActivity extends ActivityPresentImp<WeatherView> implements SwipeRefreshLayout.OnRefreshListener,View.OnClickListener {
 
     private ILogicModel modelBiz;
-
+    private String globalweatherId;
     @Override
     public void afterViewCreate(Bundle savedInstance) {
         super.afterViewCreate(savedInstance);
@@ -46,20 +48,19 @@ public class WeatherActivity extends ActivityPresentImp<WeatherView>{
         }else{
             loadBgPic();
         }
-//         String weatherString = preferences.getString("weather",null);
-//        if(weatherString!=null)
-//        {
-//            Weather weather = Utility.handleWeatherResponse(weatherString);
-//            showWeatherInfo(weather);
-//        }else{
-//            String weatherId = getIntent().getStringExtra("weather_id");
-//            mView.showNdHideWeather(false);
-//            requestWeather(weatherId);
-//        }
+         String weatherString = preferences.getString("weather",null);
+        if(weatherString!=null)
+        {
+            Weather weather = Utility.handleWeatherResponse(weatherString);
+            globalweatherId = weather.basic.weatherId;
+            showWeatherInfo(weather);
+        }else{
+            globalweatherId = getIntent().getStringExtra("weather_id");
+            mView.showNdHideWeather(false);
+            requestWeather(globalweatherId);
+        }
 
-        String weatherId = getIntent().getStringExtra("weather_id");
-        mView.showNdHideWeather(false);
-        requestWeather(weatherId);
+
 
     }
 
@@ -82,11 +83,14 @@ public class WeatherActivity extends ActivityPresentImp<WeatherView>{
                 }else{
                     Toast.makeText(WeatherActivity.this,"获取天气信息失败",Toast.LENGTH_LONG).show();
                 }
+
+                mView.closeRefreshOropen(false);
             }
 
             @Override
             public void onFail() {
                 Toast.makeText(WeatherActivity.this,"获取天气信息失败",Toast.LENGTH_LONG).show();
+                mView.closeRefreshOropen(false);
             }
         });
         loadBgPic();
@@ -115,6 +119,26 @@ public class WeatherActivity extends ActivityPresentImp<WeatherView>{
 
             }
         });
+    }
+
+    @Override
+    public void onRefresh() {
+        requestWeather(globalweatherId);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if(v.getId()==R.id.nav_button)
+        {
+            mView.openDrawlayoutOrclose("open");
+        }
+    }
+
+    public  void refreshNewCity(String weatherId)
+    {    globalweatherId = weatherId;
+        mView.openDrawlayoutOrclose("close");
+        mView.closeRefreshOropen(true);
+        requestWeather(globalweatherId);
     }
 
 }

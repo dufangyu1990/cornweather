@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
+import com.cornweather.android.MainActivity;
 import com.cornweather.android.R;
 import com.cornweather.android.WeatherActivity;
 import com.cornweather.android.callback.DataCallBack;
@@ -88,10 +89,19 @@ public class ChooseAreaFragment extends FragmentPresentImp<AreaFragmentView> imp
         }else if(currentLevel==Constant.LEVEL_COUNTRY)
         {
             String weatherId = countryList.get(position).getWeatherId();
-            Intent intent = new Intent(getActivity(), WeatherActivity.class);
-            intent.putExtra("weather_id",weatherId);
-            startActivity(intent);
-            getActivity().finish();
+            if(getActivity() instanceof MainActivity)
+            {
+                Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                intent.putExtra("weather_id",weatherId);
+                startActivity(intent);
+                getActivity().finish();
+            }else if(getActivity() instanceof WeatherActivity)
+            {
+                WeatherActivity activity = (WeatherActivity) getActivity();
+                activity.refreshNewCity(weatherId);
+            }
+
+
         }
 
 

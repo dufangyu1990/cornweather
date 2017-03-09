@@ -14,6 +14,19 @@
         />
 
 
+   <android.support.v4.widget.DrawerLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:id="@+id/draw_layout"
+       >
+
+<android.support.v4.widget.SwipeRefreshLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/swip_refresh"
+    >
+
+
     <ScrollView
         android:layout_width="match_parent"
         android:id="@+id/weather_layout"
@@ -38,5 +51,18 @@
 
     </ScrollView>
 
+
+</android.support.v4.widget.SwipeRefreshLayout>
+
+
+       <fragment
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"
+           android:name="com.cornweather.android.fragment.ChooseAreaFragment"
+           android:id="@+id/choose_area_fragment"
+           android:layout_gravity="start"
+           />
+
+   </android.support.v4.widget.DrawerLayout>
 
 </FrameLayout>
